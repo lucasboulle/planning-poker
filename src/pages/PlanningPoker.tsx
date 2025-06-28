@@ -31,7 +31,9 @@ export const PlanningPoker = () => {
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Planning Poker</h1>
       <div className="flex flex-row flex-grow">
         <div className="basis-3/4 pr-8">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">{votingTask?.title || "Select a task"}</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">
+            {votingTask?.title || "Select a task"}
+          </h2>
           <div className="grid grid-cols-3 gap-4 justify-items-center content-center mb-8">
             {votingNumbers.map((number) => (
               <VotingCard
@@ -43,16 +45,20 @@ export const PlanningPoker = () => {
               />
             ))}
           </div>
-          
+
           <button
-            onClick={toggleVoters}
+            onClick={() => setShowVoters(!showVoters)}
             className="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
             {showVoters ? "Hide Voting Table" : "Show Voting Table"}
           </button>
-          
+
           {showVoters && (
-            <VotingTable voters={voters} votingNumbers={votingNumbers} />
+            <VotingTable
+              voters={voters}
+              votingNumbers={votingNumbers}
+              isVisible={showVoters}
+            />
           )}
         </div>
         <div className="basis-1/4 bg-white p-6 overflow-y-auto shadow-lg">
@@ -68,5 +74,5 @@ export const PlanningPoker = () => {
         </div>
       </div>
     </div>
-  );
+  )
 };
