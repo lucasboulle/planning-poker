@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { VotingCard } from './VotingCard';
 
 type VotingTableProps = {
   voters: Array<{ id: string; name: string; vote: string | null }>;
@@ -8,37 +9,41 @@ type VotingTableProps = {
 
 export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers }) => {
   return (
-    <div className="relative w-full h-96 bg-green-200 rounded-full overflow-hidden">
+    <div className="relative w-4/5 h-96 mx-auto bg-green-200 rounded-full overflow-hidden">
       {/* Table */}
       <div className="absolute inset-4 bg-green-300 rounded-full"></div>
       
       {/* Cards */}
       {votingNumbers.map((number, index) => {
         const angle = (index / votingNumbers.length) * 2 * Math.PI;
-        const x = 50 + 40 * Math.cos(angle);
+        const x = 50 + 30 * Math.cos(angle);
         const y = 50 + 40 * Math.sin(angle);
         
         return (
-          <motion.div
+          <div
             key={number}
-            className="absolute w-12 h-16 bg-white rounded-lg shadow-md flex items-center justify-center text-xl font-bold"
+            className="absolute transform -translate-x-1/2 -translate-y-1/2"
             style={{
               left: `${x}%`,
               top: `${y}%`,
-              transform: 'translate(-50%, -50%)',
+              transform: 'translate(-50%, -50%) scale(0.45)', // Scale down to 45%
             }}
-            // whileHover={{ scale: 1.1 }}
           >
-            {number}
-          </motion.div>
+            <VotingCard
+              id={number}
+              title={number}
+              isSelected={false}
+              onClick={() => {}}
+            />
+          </div>
         );
       })}
       
       {/* Voters */}
       {voters.map((voter, index) => {
         const angle = (index / voters.length) * 2 * Math.PI;
-        const x = 50 + 47 * Math.cos(angle);
-        const y = 50 + 47 * Math.sin(angle);
+        const x = 50 + 25 * Math.cos(angle);
+        const y = 50 + 23 * Math.sin(angle);
         
         return (
           <motion.div
@@ -49,7 +54,6 @@ export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers 
               top: `${y}%`,
               transform: 'translate(-50%, -50%)',
             }}
-            // whileHover={{ scale: 1.1 }}
           >
             {voter.name[0]}
           </motion.div>
