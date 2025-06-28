@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { tasksMock, votingNumbersMock, votersMock } from "../constants";
 import { Task, TaskCard } from "./components/TaskCard";
 import { VotingCard } from "./components/VotingCard";
@@ -11,11 +11,13 @@ export const PlanningPoker = () => {
   const [selectedNumber, setSelectedNumber] = useState<string | null>(null);
   const [voters, setVoters] = useState(votersMock);
   const [showVoters, setShowVoters] = useState(false);
+  const [animateCards, setAnimateCards] = useState(false);
 
   const handleTaskSelect = (task: Task) => {
     setVotingTask(task);
     setSelectedNumber(null);
     setVoters(voters.map(voter => ({ ...voter, vote: null })));
+    setAnimateCards(true);
   };
 
   const handleNumberSelect = (number: string) => {
@@ -25,6 +27,13 @@ export const PlanningPoker = () => {
   const toggleVoters = () => {
     setShowVoters(!showVoters);
   };
+
+  useEffect(() => {
+    if (animateCards) {
+      const timer = setTimeout(() => setAnimateCards(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [animateCards]);
 
   return (
     <div className="flex flex-col h-screen w-screen bg-gray-100 p-8">
@@ -42,6 +51,7 @@ export const PlanningPoker = () => {
                 title={number}
                 isSelected={selectedNumber === number}
                 onClick={() => handleNumberSelect(number)}
+                animate={animateCards}
               />
             ))}
           </div>

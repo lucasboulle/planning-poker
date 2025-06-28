@@ -10,14 +10,14 @@ type VotingTableProps = {
 
 export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers, isVisible }) => {
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isVisible && (
         <motion.div
+          key="voting-table"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-        
           className="relative w-4/5 h-96 mx-auto bg-green-200 rounded-full overflow-hidden"
         >
           {/* Table */}
@@ -26,7 +26,7 @@ export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers,
           {/* Cards */}
           {votingNumbers.map((number, index) => {
             const angle = (index / votingNumbers.length) * 2 * Math.PI;
-            const x = 45 + 30 * Math.cos(angle);
+            const x = 47 + 30 * Math.cos(angle);
             const y = 30 + 40 * Math.sin(angle);
             
             return (
@@ -51,6 +51,7 @@ export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers,
                   title={number}
                   isSelected={false}
                   onClick={() => {}}
+                  animate={false}
                 />
               </motion.div>
             );
@@ -58,9 +59,9 @@ export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers,
           
           {/* Voters */}
           {voters.map((voter, index) => {
-            const angle = (index / votingNumbers.length) * 2 * Math.PI;
-            const x = 50 + 25 * Math.cos(angle);
-            const y = 50 + 23 * Math.sin(angle);
+            const angle = (index / voters.length) * 2 * Math.PI;
+            const x = 50 + 24 * Math.cos(angle);
+            const y = 45 + 23 * Math.sin(angle);
             
             return (
               <motion.div
@@ -70,6 +71,14 @@ export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers,
                   left: `${x}%`,
                   top: `${y}%`,
                   transform: 'translate(-50%, -50%)',
+                }}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20,
+                  delay: index * 0.05
                 }}
               >
                 {voter.name[0]}
