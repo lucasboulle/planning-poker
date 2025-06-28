@@ -1,22 +1,28 @@
+import { motion } from "framer-motion";
+
 export type Task = {
   id: string;
   title: string;
   description: string;
-  selectedTaskId?: string;
 };
 
-export const TaskCard = ({ id, title, description, selectedTaskId }: Task) => {
-  const selectedTaskBorder =
-    selectedTaskId === id ? "border-blue-500 border-8" : "";
+type TaskCardProps = Task & {
+  isSelected: boolean;
+  onClick: () => void;
+};
+
+export const TaskCard = ({ id, title, description, isSelected, onClick }: TaskCardProps) => {
   return (
-    <div
-      className={`max-w-md mx-auto bg-white rounded-xl overflow-hidden shadow-lg p-6 m-5 sm:flex sm:items-center ${selectedTaskBorder}`}
-      key={id}
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      className={`mb-4 bg-white rounded-xl overflow-hidden shadow-md p-4 cursor-pointer transition-all duration-300 ${
+        isSelected ? "border-4 border-blue-500" : "border border-gray-200"
+      }`}
     >
-      <div className="mt-4 sm:mt-0 sm:ml-4">
-        <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
-        <p className="text-gray-600">{description}</p>
-      </div>
-    </div>
+      <h3 className="text-lg font-semibold text-gray-800 mb-2">{title}</h3>
+      <p className="text-gray-600 text-sm">{description}</p>
+    </motion.div>
   );
 };
