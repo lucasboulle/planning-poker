@@ -1,28 +1,59 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { tasksMock, votingNumbersMock, votersMock } from "../constants";
 import { Task, TaskCard } from "./components/TaskCard";
 import { VotingCard } from "./components/VotingCard";
 import { VotingTable } from "./components/VotingTable";
+import { P2PService } from "../services/P2PService";
+import { Voter } from "../types/interfaces";
 
 export const PlanningPoker = () => {
   const tasks: Task[] = tasksMock;
   const votingNumbers: string[] = votingNumbersMock;
   const [votingTask, setVotingTask] = useState<Task | null>(tasks[0] || null);
   const [selectedNumber, setSelectedNumber] = useState<string | null>(null);
-  const [voters, setVoters] = useState(votersMock);
+  const [voters, setVoters] = useState<Voter[]>(votersMock);
   const [showVoters, setShowVoters] = useState(false);
   const [animateCards, setAnimateCards] = useState(false);
   const [backState, setBackState] = useState<'question' | 'check'>('question');
+  const [p2pService, setP2PService] = useState<P2PService | null>(null);
+  const [peerId, setPeerId] = useState<string>('');
+
+  const handleVotersUpdate = useCallback((updatedVoters: Voter[]) => {
+    setVoters(updatedVoters);
+  }, []);
+
+  useEffect(() => {
+    const service = new P2PService(handleVotersUpdate);
+    setP2PService(service);
+    setPeerId(service.getPeerId());
+
+    return () => {
+      service.disconnect();
+    };
+  }, [handleVotersUpdate]);
+
+  const handleConnect = (targetPeerId: string) => {
+    console.log('🚀 ~ handleConnect ~ p2pService:', p2pService)
+    p2pService?.connect(targetPeerId);
+  };
 
   const handleTaskSelect = (task: Task) => {
     setVotingTask(task);
     setSelectedNumber(null);
-    setVoters(voters.map(voter => ({ ...voter, vote: null })));
+    p2pService?.broadcastMessage({ type: 'resetVotes', taskId: task.id });
     setAnimateCards(true);
   };
 
   const handleNumberSelect = (number: string) => {
     setSelectedNumber(number);
+    if (p2pService) {
+      p2pService.broadcastMessage({ 
+        type: 'vote', 
+        taskId: votingTask?.id, 
+        vote: number,
+        voterId: p2pService.getPeerId() // Use the P2PService method to get the peerId
+      });
+    }
   };
 
   const toggleVoters = () => {
@@ -30,7 +61,9 @@ export const PlanningPoker = () => {
   };
 
   const toggleBackState = () => {
-    setBackState(prev => prev === 'question' ? 'check' : 'question');
+    const newBackState = backState === 'question' ? 'check' : 'question';
+    setBackState(newBackState);
+    p2pService?.broadcastMessage({ type: 'toggleBackState', backState: newBackState });
   };
 
   useEffect(() => {
@@ -43,6 +76,12 @@ export const PlanningPoker = () => {
   return (
     <div className="flex flex-col h-screen w-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Planning Poker</h1>
+      <div>Your Peer ID: {peerId}</div>
+      <input 
+        type="text" 
+        placeholder="Enter peer ID to connect" 
+        onChange={(e) => handleConnect(e.target.value)}
+      />
       <div className="flex flex-row flex-grow">
         <div className="basis-3/4 pr-8 flex flex-col">
           <h2 className="text-xl font-semibold mb-4 text-gray-700">
