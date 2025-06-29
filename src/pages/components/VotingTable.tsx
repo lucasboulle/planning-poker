@@ -52,6 +52,8 @@ export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers,
                   isSelected={false}
                   onClick={() => {}}
                   animate={false}
+                  flipOnClick={true}
+                  backState="question"
                 />
               </motion.div>
             );
