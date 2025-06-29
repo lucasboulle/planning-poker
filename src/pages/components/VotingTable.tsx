@@ -1,14 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VotingCard } from './VotingCard';
+import { VoterAvatar } from './VoterAvatar';
 
 type VotingTableProps = {
   voters: Array<{ id: string; name: string; vote: string | null }>;
   votingNumbers: string[];
   isVisible: boolean;
+  backState: 'question' | 'check';
 };
 
-export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers, isVisible }) => {
+export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers, isVisible, backState }) => {
+  const [flippedCards, setFlippedCards] = useState<{ [key: string]: boolean }>({});
+
+  useEffect(() => {
+    // Initialize all cards as flipped
+    const initialFlippedState = voters.reduce((acc, voter) => {
+      acc[voter.id] = true;  // Set to true to start flipped
+      return acc;
+    }, {} as { [key: string]: boolean });
+    setFlippedCards(initialFlippedState);
+  }, [voters]);
+
+  const handleCardClick = (voterId: string) => {
+    setFlippedCards(prev => ({ ...prev, [voterId]: !prev[voterId] }));
+  };
+
   return (
     <AnimatePresence mode="wait">
       {isVisible && (
@@ -23,15 +40,15 @@ export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers,
           {/* Table */}
           <div className="absolute inset-4 bg-green-300 rounded-full"></div>
           
-          {/* Cards */}
-          {votingNumbers.map((number, index) => {
-            const angle = (index / votingNumbers.length) * 2 * Math.PI;
+          {/* Voter Cards */}
+          {voters.map((voter, index) => {
+            const angle = (index / voters.length) * 2 * Math.PI;
             const x = 47 + 30 * Math.cos(angle);
             const y = 30 + 40 * Math.sin(angle);
             
             return (
               <motion.div
-                key={number}
+                key={voter.id}
                 className="absolute"
                 style={{
                   left: `${x}%`,
@@ -47,46 +64,27 @@ export const VotingTable: React.FC<VotingTableProps> = ({ voters, votingNumbers,
                 }}
               >
                 <VotingCard
-                  id={number}
-                  title={number}
+                  id={voter.id}
+                  title={voter.vote ?? '?'}
                   isSelected={false}
-                  onClick={() => {}}
+                  isFlipped={flippedCards[voter.id]}
+                  onClick={() => handleCardClick(voter.id)}
                   animate={false}
-                  flipOnClick={true}
-                  backState="question"
+                  backState={backState}
                 />
               </motion.div>
             );
           })}
           
-          {/* Voters */}
-          {voters.map((voter, index) => {
-            const angle = (index / voters.length) * 2 * Math.PI;
-            const x = 50 + 24 * Math.cos(angle);
-            const y = 45 + 23 * Math.sin(angle);
-            
-            return (
-              <motion.div
-                key={voter.id}
-                className="absolute w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs"
-                style={{
-                  left: `${x}%`,
-                  top: `${y}%`,
-                  transform: 'translate(-50%, -50%)',
-                }}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 260,
-                  damping: 20,
-                  delay: index * 0.05
-                }}
-              >
-                {voter.name[0]}
-              </motion.div>
-            );
-          })}
+          {/* Voter Avatars */}
+          {voters.map((voter, index) => (
+            <VoterAvatar
+              key={`avatar-${voter.id}`}
+              voter={voter}
+              index={index}
+              totalVoters={voters.length}
+            />
+          ))}
         </motion.div>
       )}
     </AnimatePresence>

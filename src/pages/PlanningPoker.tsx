@@ -12,6 +12,7 @@ export const PlanningPoker = () => {
   const [voters, setVoters] = useState(votersMock);
   const [showVoters, setShowVoters] = useState(false);
   const [animateCards, setAnimateCards] = useState(false);
+  const [backState, setBackState] = useState<'question' | 'check'>('question');
 
   const handleTaskSelect = (task: Task) => {
     setVotingTask(task);
@@ -26,6 +27,10 @@ export const PlanningPoker = () => {
 
   const toggleVoters = () => {
     setShowVoters(!showVoters);
+  };
+
+  const toggleBackState = () => {
+    setBackState(prev => prev === 'question' ? 'check' : 'question');
   };
 
   useEffect(() => {
@@ -43,7 +48,7 @@ export const PlanningPoker = () => {
           <h2 className="text-xl font-semibold mb-4 text-gray-700">
             {votingTask?.title || "Select a task"}
           </h2>
-          <div className="flex-grow flex flex-col justify-center"> {/* Added this wrapper */}
+          <div className="flex-grow flex flex-col justify-center">
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 justify-items-center content-center mb-8">
               {votingNumbers.map((number) => (
                 <VotingCard
@@ -53,12 +58,13 @@ export const PlanningPoker = () => {
                   isSelected={selectedNumber === number}
                   onClick={() => handleNumberSelect(number)}
                   animate={animateCards}
+                  backState={backState}
                 />
               ))}
             </div>
           </div>
 
-          <div className="mt-8">
+          <div className="mt-8 flex justify-between">
             <button
               onClick={toggleVoters}
               className="mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -66,14 +72,22 @@ export const PlanningPoker = () => {
               {showVoters ? "Hide Voting Table" : "Show Voting Table"}
             </button>
 
-            {showVoters && (
-              <VotingTable
-                voters={voters}
-                votingNumbers={votingNumbers}
-                isVisible={showVoters}
-              />
-            )}
+            <button
+              onClick={toggleBackState}
+              className="mb-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Toggle Card Back
+            </button>
           </div>
+
+          {showVoters && (
+            <VotingTable
+              voters={voters}
+              votingNumbers={votingNumbers}
+              isVisible={showVoters}
+              backState={backState}
+            />
+          )}
         </div>
         <div className="basis-1/4 bg-white p-6 overflow-y-auto shadow-lg">
           <h2 className="text-2xl font-bold mb-4 text-gray-800">Story Cards</h2>

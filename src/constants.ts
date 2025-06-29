@@ -25,4 +25,5 @@ export const votersMock = [
     { id: '4', name: 'Diana', vote: null },
     { id: '5', name: 'Ethan', vote: null },
     { id: '6', name: 'Fany', vote: null },
+    // { id: '7', name: 'Gabriel', vote: null },
 ];
